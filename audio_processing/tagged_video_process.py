@@ -12,10 +12,6 @@ from global_config import *
 videos = {}
 total_task_time = {}
 
-starting_time = {
-    "101": 15
-}
-
 
 def read_file(directory, filename):
     file_parts = filename.split('-')
@@ -32,8 +28,8 @@ def read_file(directory, filename):
                 start = parser.parse(times[0])
                 end = parser.parse(times[1])
                 if sub:
-                    start += timedelta(minutes=30)
-                    end += timedelta(minutes=30)
+                    start += timedelta(seconds=1790)
+                    end += timedelta(seconds=1790)
                 # print("{} --> {}".format(start.strftime('%H:%M:%S.%f'), end.strftime('%H:%M:%S.%f')))
                 videos[file_parts[0]].append((end - start).total_seconds())
                 counter += 1

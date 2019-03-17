@@ -27,7 +27,8 @@ def read_file(directory, filename):
             one_action = json.loads(line)
             if init_time is None:
                 init_time = parser.parse(one_action['time'])
-            print("time:{}, type:{}".format(one_action['time'], one_action['acttype']))
+            print("time:{}, type:{}, user:{}".format((parser.parse(one_action['time']) - init_time).total_seconds(),
+                                                     one_action['acttype'], one_action['user']))
             # if one_action["acttype"] == "MOVE_CARD":
             #     coord = [float(c) for c in one_action['data']['end'].split(',')]
             #     if one_action['data']['name'] == target["name"]:
@@ -45,7 +46,7 @@ def read_file(directory, filename):
 def process(directory):
     for filename in os.listdir(directory):
         if filename.endswith(".txt"):
-            if filename == "101.txt":
+            if filename == "312.txt":
                 read_file(directory, filename)
             continue
         else:
