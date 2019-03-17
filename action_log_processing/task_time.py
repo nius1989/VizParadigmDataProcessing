@@ -11,7 +11,7 @@ result = {}
 
 def read_file(directory, filename):
     print(filename)
-    start_time = None
+    start_time = datetime.now()
     search_end_time = datetime.now()
     end_time = datetime.now()
     groupid = filename.split('.')[0]
@@ -19,7 +19,7 @@ def read_file(directory, filename):
         line = data_file.readline()
         while line:
             one_action = json.loads(line)
-            if one_action["acttype"] == "ADD_CARD" and start_time is None:
+            if one_action["acttype"] == "START":
                 start_time = parser.parse(one_action["time"])
             if one_action["acttype"] == "MOVE_CARD":
                 end_time = parser.parse(one_action["time"])
