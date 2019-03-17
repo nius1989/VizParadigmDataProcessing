@@ -10,6 +10,7 @@ from datetime import timedelta
 from global_config import *
 
 videos = {}
+total_task_time = {}
 
 starting_time_adjustment = {
     "101": 1,
@@ -66,6 +67,19 @@ def read_file(directory, filename):
             line = srt.readline()
 
 
+def fix_202():
+    zero_time = datetime.now().replace(hour=0, minute=0, second=0)
+    video_202 = []
+    for stamp in videos["202"]:
+        if (stamp["start_time"] - zero_time).total_seconds() < 34 * 60:
+            video_202.append(stamp)
+        elif (stamp["start_time"] - zero_time).total_seconds() > 36.05 * 60:
+            stamp["start_time"] -= timedelta(minutes=2.05)
+            stamp["end_time"] -= timedelta(minutes=2.05)
+            video_202.append(stamp)
+    videos["202"] = video_202
+
+
 def adjust_time():
     zero_time = datetime.now().replace(hour=0, minute=0, second=0)
     for groupid in videos:
@@ -73,12 +87,23 @@ def adjust_time():
             stamp["start_time"] -= timedelta(seconds=starting_time_adjustment[groupid])
             stamp["end_time"] -= timedelta(seconds=starting_time_adjustment[groupid])
         videos[groupid] = list(filter(lambda x: x['start_time'] > zero_time, videos[groupid]))
+        task_time = total_task_time[groupid]
+        videos[groupid] = list(
+            filter(lambda x: x['start_time'] < (zero_time + timedelta(seconds=task_time)), videos[groupid]))
+
+
+def save_csv():
+    zero_time = datetime.now().replace(hour=0, minute=0, second=0)
+    avg_list = []
+    for groupid in videos:
         with open(processed_script_json + "\\" + groupid + '.csv', mode='w', newline='') as overhead_data:
             overhead_writer = csv.writer(overhead_data, lineterminator='\n')
             overhead_writer.writerow(["start", "end"])
             for stamp in videos[groupid]:
                 overhead_writer.writerow([(stamp["start_time"] - zero_time).total_seconds(),
                                           (stamp["end_time"] - zero_time).total_seconds()])
+                avg_list.append((stamp["end_time"] - stamp["start_time"]).total_seconds())
+    print("avg:{}".format(sum(avg_list) / len(avg_list)))
 
 
 def process(directory):
@@ -99,7 +124,15 @@ def switcher(text_code):
         return "MEG"
 
 
+def load_task_time(csv_file):
+    time_data = csv.DictReader(open(csv_file))
+    for row in time_data:
+        total_task_time[row['group ID']] = float(row['task time(s)'])
+
+
 if __name__ == '__main__':
+    load_task_time(final_result_dir + "total_task_time.csv")
     process(processed_script)
     adjust_time()
-    # save_csv(videos)
+    fix_202()
+    save_csv()

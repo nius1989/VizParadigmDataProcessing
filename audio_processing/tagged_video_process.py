@@ -14,31 +14,17 @@ total_task_time = {}
 
 
 def read_file(directory, filename):
-    file_parts = filename.split('-')
-    print("read file: " + filename)
-    if file_parts[0] not in videos:
-        videos[file_parts[0]] = []
-    sub = file_parts[1] is '2'
-    with open(os.path.join(directory, filename)) as srt:
-        counter = 0
-        line = srt.readline()
-        while line:
-            if re.match('\d{2}:\d{2}:\d{2},\d{3} \-\-> \d{2}:\d{2}:\d{2},\d{3}', line):
-                times = re.findall('\d{2}:\d{2}:\d{2},\d{3}', line)
-                start = parser.parse(times[0])
-                end = parser.parse(times[1])
-                if sub:
-                    start += timedelta(seconds=1790)
-                    end += timedelta(seconds=1790)
-                # print("{} --> {}".format(start.strftime('%H:%M:%S.%f'), end.strftime('%H:%M:%S.%f')))
-                videos[file_parts[0]].append((end - start).total_seconds())
-                counter += 1
-            line = srt.readline()
+    groupid = filename.split('.')[0]
+    work_sheet = csv.DictReader(open(os.path.join(directory, filename)))
+    speech_time = []
+    for row in work_sheet:
+        speech_time.append(float(row['end']) - float(row['start']))
+    videos[groupid] = speech_time
 
 
 def process(directory):
     for filename in os.listdir(directory):
-        if filename.endswith(".srt"):
+        if filename.endswith(".csv"):
             read_file(directory, filename)
             continue
         else:
@@ -72,5 +58,5 @@ def load_task_time(csv_file):
 
 if __name__ == '__main__':
     load_task_time(final_result_dir + "total_task_time.csv")
-    process(processed_script)
+    process(processed_script_json)
     save_csv(videos)

@@ -8,18 +8,17 @@ from global_config import *
 
 result = {}
 total_task_time = {}
+total_speech_time = {}
 interval = 6
 
 
 def read_file(directory, filename):
     print(filename)
-    move_counter = 0
     groupid = filename.split('.')[0]
     init_time = None
-    buffer = []
+    buffer = {}
     with open(os.path.join(directory, filename), 'r', encoding='utf8') as data_file:
         line = data_file.readline()
-        buffer = {}
         while line:
             one_action = json.loads(line)
             if init_time is None and one_action['acttype'] == "START":
@@ -32,35 +31,65 @@ def read_file(directory, filename):
                     buffer[bin_num] = []
                 buffer[bin_num].append(one_action)
             line = data_file.readline()
-    non_interact = 0
-    one_interact = 0
-    two_interact = 0
     max_index = max(buffer.keys())
     rg = [i for i in range(max_index + 1)]
+    action_pattern = {}
     for i in rg:
+        if check_speech(groupid, i):
+            action_pattern[i] = "C"
+        else:
+            action_pattern[i] = "L"
         if i not in buffer:
-            non_interact += 1
+            action_pattern[i] += "N"
             continue
         a_interact = list(filter(lambda x: x["user"] == "ALEX", buffer[i]))
         c_interact = list(filter(lambda x: x["user"] == "CHRIS", buffer[i]))
         if len(a_interact) != 0 and len(c_interact) != 0:
-            two_interact += 1
+            action_pattern[i] += "B"
         else:
-            one_interact += 1
-
-    result[groupid] = {
-        "non": non_interact / (max_index + 1),
-        "one": one_interact / (max_index + 1),
-        "two": two_interact / (max_index + 1)
+            action_pattern[i] += "O"
+    pattern_count = {
+        "LN": 0,
+        "LO": 0,
+        "LB": 0,
+        "CN": 0,
+        "CO": 0,
+        "CB": 0
     }
+    for k, v in action_pattern.items():
+        pattern_count[v] += 1
+    result[groupid] = pattern_count
+    print(pattern_count)
+
+
+def load_speech(directory, filename):
+    groupid = filename.split('.')[0]
+    work_sheet = csv.DictReader(open(os.path.join(directory, filename)))
+    speech_time = []
+    for row in work_sheet:
+        speech_time.append({"start": float(row['start']), "end": float(row['end'])})
+    total_speech_time[groupid] = speech_time
+
+
+def check_speech(groupid, time_stamp):
+    for time in total_speech_time[groupid]:
+        if time['start'] < time_stamp * interval and time['end'] > (time_stamp + 1) * interval:
+            return True
+        elif time['start'] > time_stamp * interval and time['end'] < (time_stamp + 1) * interval:
+            return True
+        elif time['start'] < time_stamp * interval < time['end']:
+            return True
+        elif time['start'] < (time_stamp + 1) * interval < time['end']:
+            return True
+    return False
 
 
 def save_csv(data):
-    with open(final_result_dir + 'sim_seq_pattern.csv', mode='w', newline='') as overhead_data:
+    with open(final_result_dir + 'speech_action_matching.csv', mode='w', newline='') as overhead_data:
         overhead_writer = csv.writer(overhead_data, lineterminator='\n')
-        overhead_writer.writerow(["paradigm", "group ID", "two interact", "one interact", "no interact"])
+        overhead_writer.writerow(["paradigm", "group ID", "CB", "CO", "CN", "LB", "LO", "LN"])
         for k, v in sorted(data.items()):
-            overhead_writer.writerow([switcher(str(k)[0]), k, v["two"], v["one"], v["non"]])
+            overhead_writer.writerow([switcher(str(k)[0]), k, v["CB"], v["CO"], v["CN"], v["LB"], v["LO"], v["LN"]])
 
 
 def switcher(text_code):
@@ -81,6 +110,16 @@ def process(directory):
             continue
 
 
+def process2(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith(".csv"):
+            load_speech(directory, filename)
+            continue
+        else:
+            continue
+
+
 if __name__ == '__main__':
+    process2(processed_script_json)
     process(bulk_data)
     save_csv(result)
