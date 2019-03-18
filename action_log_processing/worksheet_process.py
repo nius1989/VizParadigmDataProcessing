@@ -55,20 +55,20 @@ def check_answer(csv_file):
     work_sheet = csv.DictReader(open(csv_file))
     with open(final_result_dir + 'worksheet_answer_5.csv', mode='w', newline='') as overhead_data:
         overhead_writer = csv.writer(overhead_data, lineterminator='\n')
-        overhead_writer.writerow(["paradigm", "group ID"] + list(map(str, keys.keys())) + ["total correct answers"])
+        overhead_writer.writerow(["paradigm", "group ID"] + list(map(str, keys.keys())) + ["total missed answers"])
         for row in work_sheet:
             print(row["Group code"], end=',')
             correct_output = []
             total_correct = 0
             for k in keys:
                 answers = [str(c).strip().lower() for c in row[k].split(',')]
-                correct_count = 0
+                wrong_count = 0
                 for key in keys[k]:
-                    if key in answers:
-                        correct_count += 1
-                total_correct += correct_count
-                correct_output.append(correct_count)
-                print(correct_count, end=',')
+                    if key not in answers:
+                        wrong_count += 1
+                total_correct += wrong_count
+                correct_output.append(wrong_count)
+                print(wrong_count, end=',')
             print(total_correct)
             correct_output.append(total_correct)
             overhead_writer.writerow(

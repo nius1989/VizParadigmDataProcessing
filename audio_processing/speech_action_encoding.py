@@ -9,7 +9,7 @@ from global_config import *
 result = {}
 total_task_time = {}
 total_speech_time = {}
-interval = 6
+interval = 6.76
 
 
 def read_file(directory, filename):
