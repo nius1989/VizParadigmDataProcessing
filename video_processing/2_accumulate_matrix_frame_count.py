@@ -3,6 +3,7 @@ import cv2
 import copy
 import csv
 import os
+from global_config import *
 
 
 def read_file(dir, file):
@@ -11,7 +12,6 @@ def read_file(dir, file):
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
-            print(line_count)
             for col in range(len(row)):
                 counter[col] += float(row[col])
             line_count += 1
@@ -32,4 +32,4 @@ def process(directory):
 
 
 if __name__ == '__main__':
-    process("D:\\viz_data\\video_process_csv_data")
+    process(root + "video_process_csv_data\\")
