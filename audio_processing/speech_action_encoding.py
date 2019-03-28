@@ -54,10 +54,15 @@ def read_file(directory, filename):
         "LB": 0,
         "CN": 0,
         "CO": 0,
-        "CB": 0
+        "CB": 0,
+        "CHG": 0
     }
+    pre_state = ""
     for k, v in action_pattern.items():
         pattern_count[v] += 1
+        if pre_state != v:
+            pattern_count['CHG'] += 1
+            pre_state = v
     result[groupid] = pattern_count
     print(pattern_count)
 
@@ -87,9 +92,11 @@ def check_speech(groupid, time_stamp):
 def save_csv(data):
     with open(final_result_dir + 'speech_action_matching.csv', mode='w', newline='') as overhead_data:
         overhead_writer = csv.writer(overhead_data, lineterminator='\n')
-        overhead_writer.writerow(["paradigm", "group ID", "CB", "CO", "CN", "LB", "LO", "LN"])
+        overhead_writer.writerow(["paradigm", "group ID", "CB", "CO", "CN", "LB", "LO", "LN", "CHG", "CHG/Fre"])
         for k, v in sorted(data.items()):
-            overhead_writer.writerow([switcher(str(k)[0]), k, v["CB"], v["CO"], v["CN"], v["LB"], v["LO"], v["LN"]])
+            overhead_writer.writerow(
+                [switcher(str(k)[0]), k, v["CB"], v["CO"], v["CN"], v["LB"], v["LO"], v["LN"],
+                 v["CHG"], v["CHG"] / total_task_time[k] * 60])
 
 
 def switcher(text_code):
@@ -119,7 +126,14 @@ def process2(directory):
             continue
 
 
+def load_task_time(csv_file):
+    time_data = csv.DictReader(open(csv_file))
+    for row in time_data:
+        total_task_time[row['group ID']] = float(row['task time(s)'])
+
+
 if __name__ == '__main__':
+    load_task_time(final_result_dir + "total_task_time.csv")
     process2(processed_script_json)
     process(bulk_data)
     save_csv(result)

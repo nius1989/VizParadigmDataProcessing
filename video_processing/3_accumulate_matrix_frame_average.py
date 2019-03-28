@@ -3,6 +3,7 @@ import cv2
 import copy
 import csv
 import os
+from global_config import *
 
 
 def read_file(dir, file):
@@ -36,4 +37,4 @@ def process(directory):
 
 
 if __name__ == '__main__':
-    process("D:\\viz_data_8\\accum")
+    process(root + "accum\\")

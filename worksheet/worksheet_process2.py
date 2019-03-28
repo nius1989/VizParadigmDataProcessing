@@ -43,17 +43,18 @@ def gen_correct_answer(csv_file):
                     questions[k][ans] += 1
     for k in keys:
         print("***********  " + k + "  ******************")
-        largest = nlargest(5, questions[k], key=questions[k].get)
+        largest = nlargest(4, questions[k], key=questions[k].get)
+        if k == "top 5 electronics" or k == "top 5 overnight":
+            largest = nlargest(5, questions[k], key=questions[k].get)
         for t in largest:
-            if questions[k][t] >= 14:
-                keys[k].append(t)
+            keys[k].append(t)
         for l in keys[k]:
             print("largest:{}, num:{}".format(l, questions[k][l]))
 
 
 def check_answer(csv_file):
     work_sheet = csv.DictReader(open(csv_file))
-    with open(final_result_dir + 'worksheet_answer_5.csv', mode='w', newline='') as overhead_data:
+    with open(final_result_dir + 'worksheet_answer.csv', mode='w', newline='') as overhead_data:
         overhead_writer = csv.writer(overhead_data, lineterminator='\n')
         overhead_writer.writerow(["paradigm", "group ID"] + list(map(str, keys.keys())) + ["total missed answers"])
         for row in work_sheet:
@@ -85,5 +86,5 @@ def switcher(text_code):
 
 
 if __name__ == '__main__':
-    gen_correct_answer(analysis_result + "study_worsheet_question_no_first_list.csv")
-    check_answer(analysis_result + "study_worsheet_question_no_first_list.csv")
+    gen_correct_answer(analysis_result + "study_worsheet_question_list.csv")
+    check_answer(analysis_result + "study_worsheet_question_list.csv")

@@ -12,7 +12,7 @@ import numpy
 import csv
 from global_config import *
 
-plotly.tools.set_credentials_file(username='shuoniu', api_key='dwCC2CLEvnYrO7gbbwpu')
+# plotly.tools.set_credentials_file(username='shuoniu', api_key='dwCC2CLEvnYrO7gbbwpu')
 result = {}
 
 
@@ -33,7 +33,8 @@ def read_file(directory, filename):
                 actions["move_A"] += 1
             if one_action["user"] == "CHRIS":
                 actions["move_B"] += 1
-            if one_action["acttype"] == "MOVE_CARD":
+            if one_action["acttype"] == "ADD_CARD" or one_action["acttype"] == "MOVE_CARD" or one_action[
+                "acttype"] == "TAP_CARD" or one_action["acttype"] == "REMOVE_CARD":
                 end_point = list(map(float, one_action["data"]["end"].split(',')))
                 if end_point[0] < 640:
                     actions["card_move_A"] += 1
