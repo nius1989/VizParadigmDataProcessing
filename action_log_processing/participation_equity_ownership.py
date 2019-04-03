@@ -33,9 +33,9 @@ def read_file(directory, filename):
                 actions["move_A"] += 1
             if one_action["user"] == "CHRIS":
                 actions["move_B"] += 1
-            # if one_action["acttype"] == "MOVE_CARD":
-            if one_action["acttype"] == "ADD_CARD" or one_action["acttype"] == "MOVE_CARD" or one_action[
-                "acttype"] == "TAP_CARD" or one_action["acttype"] == "REMOVE_CARD":
+            if one_action["acttype"] == "MOVE_CARD":
+            # if one_action["acttype"] == "ADD_CARD" or one_action["acttype"] == "MOVE_CARD" or one_action[
+            #     "acttype"] == "TAP_CARD" or one_action["acttype"] == "REMOVE_CARD":
                 if one_action["user"] == "ALEX":
                     actions["card_move_A"] += 1
                 if one_action["user"] == "CHRIS":

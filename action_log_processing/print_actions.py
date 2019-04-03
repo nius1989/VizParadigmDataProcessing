@@ -22,13 +22,14 @@ def read_file(directory, filename):
     }
     with open(os.path.join(directory, filename), 'r', encoding='utf8') as data_file:
         line = data_file.readline()
-        # while line:
-        for i in range(20):
+        while line:
+            # for i in range(100):
             one_action = json.loads(line)
             if init_time is None:
                 init_time = parser.parse(one_action['time'])
-            print("time:{}, type:{}, user:{}".format((parser.parse(one_action['time']) - init_time).total_seconds(),
-                                                     one_action['acttype'], one_action['user']))
+            if one_action['acttype'] == "TAP_CARD":
+                print("time:{}, type:{}, user:{}".format((parser.parse(one_action['time']) - init_time).total_seconds(),
+                                                         one_action['acttype'], one_action['user']))
             # if one_action["acttype"] == "MOVE_CARD":
             #     coord = [float(c) for c in one_action['data']['end'].split(',')]
             #     if one_action['data']['name'] == target["name"]:
@@ -46,7 +47,7 @@ def read_file(directory, filename):
 def process(directory):
     for filename in os.listdir(directory):
         if filename.endswith(".txt"):
-            if filename == "312.txt":
+            if filename == "207.txt":
                 read_file(directory, filename)
             continue
         else:
