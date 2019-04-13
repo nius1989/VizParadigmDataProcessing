@@ -57,7 +57,7 @@ def read_file(directory, filename):
             if re.match('\d{2}:\d{2}:\d{2},\d{3} \-\-> \d{2}:\d{2}:\d{2},\d{3}', line):
                 times = re.findall('\d{2}:\d{2}:\d{2},\d{3}', line)
                 start = datetime.strptime(times[0], "%H:%M:%S,%f")
-                end = parser.parse(times[1])
+                end = datetime.strptime(times[1], "%H:%M:%S,%f")
                 if sub:
                     start += timedelta(seconds=1791)
                     end += timedelta(seconds=1791)
