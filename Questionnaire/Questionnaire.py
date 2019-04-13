@@ -15,7 +15,7 @@ def process(csv_file):
     # load_questionnaire(csv_file, "questionnaire_track_observe_card", "observe card", "track work_2")
     # load_questionnaire(csv_file, "questionnaire_track_visualization", "use visualization", "track work_3")
     # load_questionnaire(csv_file, "questionnaire_viz_find_largest", "find largest items", "Viz usefulness_5")
-    # load_questionnaire(csv_file, "questionnaire_viz_identify_categories", "identify categories", "Viz usefulness_9")
+    load_questionnaire(csv_file, "questionnaire_viz_identify_categories", "identify categories", "Viz usefulness_9")
     load_questionnaire(csv_file, "questionnaire_viz_relate_specific", "relate to a specific item", "Viz usefulness_7")
     load_questionnaire(csv_file, "questionnaire_viz_common_feature", "items share common feature", "Viz usefulness_8")
     load_questionnaire(csv_file, "questionnaire_find_partner", "find items from partner", "find partner side")
