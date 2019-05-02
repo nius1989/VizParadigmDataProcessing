@@ -11,12 +11,12 @@ import xml.etree.ElementTree as ET
 from lxml import etree
 
 starting_time_adjustment = {
-    "101": 1,
+    "101": 2.2,
     "102": 5,
     "103": 5,
-    "104": 1,
+    "104": 7.8,
     "105": 9,
-    "109": 8,
+    "109": 9.4,
     "110": 9,
     "111": 7,
     "112": 9,
@@ -37,7 +37,7 @@ starting_time_adjustment = {
     "309": 8,
     "310": 9,
     "311": 36,
-    "312": 36,
+    "312": 43,
 }
 
 ticks = {}
