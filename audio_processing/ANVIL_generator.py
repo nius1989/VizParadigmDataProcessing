@@ -124,7 +124,7 @@ def save_anvil():
         ET.SubElement(head, "video",
                       src="../DATA/" + groupid + "/" + groupid + "_side.mp4",
                       master="true")
-        ET.SubElement(head, "info", key="coder", type="String").text = "coder1"
+        ET.SubElement(head, "info", key="coder", type="String").text = "Lindah"
         ET.SubElement(head, "info", key="encoding", type="String").text = "UTF-16"
         body = ET.SubElement(root, "body")
         # track1
@@ -135,6 +135,13 @@ def save_anvil():
             ET.SubElement(track, "el", index=str(i),
                           start=str(start_mark.total_seconds()), end=str(end_mark.total_seconds()))
         # track2
+        track = ET.SubElement(body, "track", name="VISGRAINS.conversation", type="primary")
+        for i in range(len(ticks[groupid]) - 1):
+            start_mark = ticks[groupid][i] - datetime(1900, 1, 1)
+            end_mark = ticks[groupid][i + 1] - datetime(1900, 1, 1)
+            ET.SubElement(track, "el", index=str(i),
+                          start=str(start_mark.total_seconds()), end=str(end_mark.total_seconds()))
+        # track3
         track = ET.SubElement(body, "track", name="VISGRAINS.touch", type="primary")
         for i in range(len(touch[groupid])):
             start_mark = touch[groupid][i]["start"] - datetime(1900, 1, 1)
@@ -142,14 +149,14 @@ def save_anvil():
             el = ET.SubElement(track, "el", index=str(i),
                                start=str(start_mark.total_seconds()), end=str(end_mark.total_seconds()))
             ET.SubElement(el, "attribute", name="touch").text = "Touch"
-        # track3
-        track = ET.SubElement(body, "track", name="VISGRAINS.speech", type="primary")
+        # track4
+        track = ET.SubElement(body, "track", name="VISGRAINS.ref_conversation", type="primary")
         for i in range(len(conversation[groupid])):
             start_mark = conversation[groupid][i]["start"] - datetime(1900, 1, 1)
             end_mark = conversation[groupid][i]["end"] - datetime(1900, 1, 1)
             el = ET.SubElement(track, "el", index=str(i),
                                start=str(start_mark.total_seconds()), end=str(end_mark.total_seconds()))
-            ET.SubElement(el, "attribute", name="speech").text = "Talk"
+            ET.SubElement(el, "attribute", name="ref_conversation").text = "Talk"
         xmlstr = ET.tostring(root, encoding='utf8', method='xml')
         dom = etree.fromstring(xmlstr)
         with open(anvil + "\\" + groupid + ".anvil", encoding="utf-8", mode="w") as data_file:

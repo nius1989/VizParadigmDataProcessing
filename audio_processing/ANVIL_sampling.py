@@ -12,7 +12,11 @@ from lxml import etree
 import random
 import cv2
 
-video_index = "105"
+video_index = "310"
+index_list = []
+time_stamps = []
+conversation = []
+touch = []
 
 
 def process():
@@ -21,25 +25,40 @@ def process():
     tree = ET.parse(file_dir)
     # get root element
     root = tree.getroot()
-    time_stamps = []
     for attention in root.findall("./body/track[@name='VISGRAINS.attention']/el"):
         start = float(attention.attrib['start'])
         end = float(attention.attrib['end'])
         time_stamps.append((start + end) / 2)
+    for t in root.findall("./body/track[@name='VISGRAINS.touch']/el"):
+        touch.append({
+            "start": float(t.attrib['start']),
+            "end": float(t.attrib['end'])
+        })
+    for c in root.findall("./body/track[@name='VISGRAINS.speech']/el"):
+        conversation.append({
+            "start": float(c.attrib['start']),
+            "end": float(c.attrib['end'])
+        })
     return time_stamps
 
 
-def gen_random(size):
-    index_list = []
+def is_event(time, list):
+    for ts in list:
+        if ts["start"] < time < ts["end"]:
+            return True
+    return False
+
+
+def gen_random():
+    random.seed(114)
     for i in range(50):
-        r = random.randint(0, len(size))
+        r = random.randint(1, len(time_stamps))
         if r not in index_list:
             index_list.append(r)
     index_list.sort()
-    return index_list
 
 
-def capture_video(index):
+def capture_video():
     # Read the video from specified path
     cam = cv2.VideoCapture("G:\\My Drive\\PROJECT_VIS_PARADIM\\DATA\\" + video_index + "\\" + video_index + "_side.mp4")
     try:
@@ -50,27 +69,35 @@ def capture_video(index):
     except OSError:
         print('Error: Creating directory of data')
         # frame
-    currentframe = 0
-    while (True):
-        # reading from frame
+    fps = 30
+    for time_index in index_list:
+        note = "Conversation:{}, Interaction:{}".format(
+            "Yes" if is_event(time_stamps[time_index], conversation) else "No",
+            "Yes" if is_event(time_stamps[time_index], touch) else "No"
+        )
+        print(note)
+        frame_no = int(int(time_stamps[time_index]) * fps)
+        # The second argument defines the frame number in range 0.0-1.0
+        cam.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
+        # Read the next frame from the video. If you set frame 749 above then the code will return the last frame.
         ret, frame = cam.read()
-        if ret:
-            # if video is still left continue creating images
-            name = './data/frame' + str(currentframe) + '.jpg'
-            print('Creating...' + name)
-            # writing the extracted images
-            cv2.imwrite(name, frame)
-            # increasing counter so that it will
-            # show how many frames are created
-            currentframe += 1
-        else:
-            break
-    # Release all space and windows once done
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(frame, note, (100, 150), font, 2, (0, 0, 0), 2, cv2.LINE_AA)
+        time_mark = "Group" + video_index + ',' + str(int(time_stamps[time_index] / 60)) + ':' + str(
+            int(time_stamps[time_index]) % 60)
+        cv2.putText(frame, time_mark, (100, 60), font, 2, (0, 0, 0), 2, cv2.LINE_AA)
+        cv2.waitKey()
+        # Store this frame to an image
+        name = anvil_capture + video_index + "\\" + video_index + '_' + str(
+            int(time_stamps[time_index] / 60)) + '_' + str(
+            int(time_stamps[time_index]) % 60) + '.jpg'
+        print(name)
+        cv2.imwrite(name, frame)
     cam.release()
     cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    time_stamps = process()
-    select_index = gen_random(time_stamps)
-    capture_video(select_index)
+    process()
+    gen_random()
+    capture_video()
